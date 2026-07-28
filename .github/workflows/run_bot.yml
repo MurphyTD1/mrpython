@@ -27,4 +27,4 @@ jobs:
         # GitHub Secrets'a sakladığımız şifreleri sunucunun işletim sistemine aktarıyoruz
         TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
-      run: python bot.py
+      run: python app.py
