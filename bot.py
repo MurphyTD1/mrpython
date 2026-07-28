@@ -1,27 +1,41 @@
-import requests 
 import os
-# Telegram Bot Bilgileri# Güvenlik için tokenları doğrudan koda yazmıyoruz, GitHub Secrets'tan çekeceğiz!TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")CHANNEL_ID = os.getenv("CHANNEL_ID")
+import requests
+
+# GitHub Secrets'tan gelen değişkenler
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+CHANNEL_ID = os.getenv("CHANNEL_ID")
+
 def get_cyber_fact():
     try:
-        # Örnek olarak ücretsiz bir API'den gereksiz/ilginç bilgi çekiyoruz
-        url = "https://jsph.pl"
-        response = requests.get(url)
-        return response.json().get("text", "Bilgi çekilemedi.")
-    except:
-        return "Sistem hatası."
+        # Çalışan rastgele bilgi API'si
+        url = "https://uselessfacts.jsph.pl/api/v2/facts/random?language=en"
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            return response.json().get("text", "Bilgi çekilemedi.")
+        return "Bilgi servisine ulaşılamadı."
+    except Exception as e:
+        print(f"API Hatası: {e}")
+        return "Sistem hatası oluştu."
+
 def send_telegram(text):
     if not TELEGRAM_TOKEN or not CHANNEL_ID:
-        print("Hata: Telegram API anahtarları eksik!")
+        print("❌ Hata: TELEGRAM_TOKEN veya CHANNEL_ID Secret'ları bulunamadı!")
         return
         
-    url = f"https://telegram.org{TELEGRAM_TOKEN}/sendMessage"
+    # Telegram API endpoint'i düzeltildi
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {
         "chat_id": CHANNEL_ID,
-        "text": f"🤖 **[Sunucusuz Bot Sistemi]**\n\n{text}",
+        "text": f"🤖 **[Günün Bilgisi]**\n\n{text}",
         "parse_mode": "Markdown"
     }
-    requests.post(url, json=payload)
-    print("Mesaj Telegram'a gönderildi!")
+    
+    res = requests.post(url, json=payload)
+    if res.status_code == 200:
+        print("✅ Mesaj Telegram'a başarıyla gönderildi!")
+    else:
+        print(f"❌ Telegram Hatası ({res.status_code}): {res.text}")
+
 if __name__ == "__main__":
     fact = get_cyber_fact()
     send_telegram(fact)
