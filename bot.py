@@ -1,4 +1,5 @@
-import requestsimport os
+import requests 
+import os
 # Telegram Bot Bilgileri# Güvenlik için tokenları doğrudan koda yazmıyoruz, GitHub Secrets'tan çekeceğiz!TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")CHANNEL_ID = os.getenv("CHANNEL_ID")
 def get_cyber_fact():
     try:
