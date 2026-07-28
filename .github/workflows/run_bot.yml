@@ -1,0 +1,30 @@
+name: 7/24 Otomatik Bot Motoru
+on:
+  schedule:
+    # Cron tablosu: Bu ayar kodun HER SAAT BAŞI otomatik çalışmasını sağlar.
+    # Dakika Saat Gün Ay HaftanınGünü (UTC zaman dilimine göredir)
+    - cron: '0 * * * *'
+  workflow_dispatch: # Bu satır, istersen GitHub sitesinden "Run" butonuna basarak botu elle de tetiklemeni sağlar.
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest # GitHub bize en güncel Ubuntu Linux sunucusunu tahsis ediyor
+
+    steps:
+    - name: Depodaki Kodları Sunucuya Çek
+      uses: actions/checkout@v4
+
+    - name: Python Ortamını Kur
+      uses: actions/setup-python@v5
+      with:
+        python-python: '3.10'
+
+    - name: Gerekli Kütüphaneleri Yükle
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Python Botunu Ateşle
+      env:
+        # GitHub Secrets'a sakladığımız şifreleri sunucunun işletim sistemine aktarıyoruz
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+      run: python bot.py
